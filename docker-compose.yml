@@ -1,0 +1,89 @@
+version: '3'
+services:
+  frontend_proxy_1:
+    image: nginx-plus:latest
+    volumes:
+      - ./frontend_proxy:/etc/nginx/frontend_proxy
+    entrypoint:
+      - nginx
+      - -c
+      - /etc/nginx/frontend_proxy/nginx.conf
+      - -p
+      - /etc/nginx/frontend_proxy
+      - -g
+      - "daemon off;"
+    ports:
+      - "10001:80"
+      - "20001:8080"
+    depends_on:
+      - backend_app
+    networks:
+      - frontend
+
+  frontend_proxy_2:
+    image: nginx-plus:latest
+    volumes:
+      - ./frontend_proxy:/etc/nginx/frontend_proxy
+    entrypoint:
+      - nginx
+      - -c
+      - /etc/nginx/frontend_proxy/nginx.conf
+      - -p
+      - /etc/nginx/frontend_proxy
+      - -g
+      - "daemon off;"
+    ports:
+      - "10002:80"
+      - "20002:8080"
+    depends_on:
+      - backend_app
+    networks:
+      - frontend
+
+  frontend_proxy_3:
+    image: nginx-plus:latest
+    volumes:
+      - ./frontend_proxy:/etc/nginx/frontend_proxy
+    entrypoint:
+      - nginx
+      - -c
+      - /etc/nginx/frontend_proxy/nginx.conf
+      - -p
+      - /etc/nginx/frontend_proxy
+      - -g
+      - "daemon off;"
+    ports:
+      - "10003:80"
+      - "20003:8080"
+    depends_on:
+      - backend_app
+    networks:
+      - frontend
+
+  load_balancer:
+    image: nginx-plus:latest
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - ./load_balancer:/etc/nginx/conf.d
+    depends_on:
+      - frontend_proxy_1
+      - frontend_proxy_2
+      - frontend_proxy_3
+    networks:
+      - frontend
+
+  backend_app:
+    image: nginx-plus:latest
+    ports:
+      - "5000:80"
+      - "5080:8080"
+    volumes:
+      - ./backend_app:/etc/nginx/conf.d
+    networks:
+      - frontend
+
+networks:
+  frontend:
+
